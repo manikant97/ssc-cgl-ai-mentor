@@ -1,31 +1,21 @@
 import cors from "cors";
 import express from "express";
+import questionRoutes from "./routes/questionRoutes.js";
 
 const app = express();
 
-// Basic CORS configuration
 app.use(cors());
 app.use(express.json());
 
-// Log all requests for debugging
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
+// Test route to verify server is working
+app.get("/test", (req, res) => {
+  res.send("TEST OK");
 });
 
-// Health check endpoint
 app.get("/health", (req, res) => {
-  res.json({ status: "OK", timestamp: new Date().toISOString() });
+  res.send("OK");
 });
 
-// Root endpoint
-app.get("/", (req, res) => {
-  res.json({
-    message: "Welcome to the API",
-    endpoints: {
-      health: "/health"
-    }
-  });
-});
+app.use("/api/questions", questionRoutes);
 
 export default app;
