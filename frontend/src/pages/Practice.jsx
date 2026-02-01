@@ -5,13 +5,32 @@ export default function Practice() {
   const [question, setQuestion] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    api
-      .get("/api/questions")
-      .then((res) => setQuestion(res.data[0]))
-      .catch((err) => console.error(err));
+    const generateAndLoad = async () => {
+      try {
+        setError(null);
+        setQuestion(null);
+        setSelectedOption(null);
+        setSubmitted(false);
+
+        await api.post("/api/ai/generate-question");
+
+        const res = await api.get("/api/questions");
+        const questions = res.data;
+        const latest = Array.isArray(questions) ? questions[questions.length - 1] : null;
+        setQuestion(latest || null);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to generate question");
+      }
+    };
+
+    generateAndLoad();
   }, []);
+
+  if (error) return <p className="text-center mt-20">{error}</p>;
 
   if (!question) return <p className="text-center mt-20">Loading...</p>;
 

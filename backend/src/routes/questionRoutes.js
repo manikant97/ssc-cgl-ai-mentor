@@ -13,7 +13,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const questions = await Question.find();
+  const questions = await Question.find().sort({ createdAt: -1 }).limit(1);
   res.json(questions);
 });
 
