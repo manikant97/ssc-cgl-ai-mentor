@@ -42,4 +42,28 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.get("/summary", async (req, res) => {
+  try {
+    const name = req.query.name;
+
+    if (!name || typeof name !== "string" || !name.trim()) {
+      return res.status(400).json({ error: "name query param is required" });
+    }
+
+    const userName = name.trim();
+    const [total, correct] = await Promise.all([
+      Attempt.countDocuments({ userName }),
+      Attempt.countDocuments({ userName, isCorrect: true }),
+    ]);
+
+    res.json({
+      total,
+      correct,
+      wrong: total - correct,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
