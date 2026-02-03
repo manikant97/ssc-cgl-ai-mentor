@@ -34,6 +34,26 @@ export default function Practice() {
 
   if (!question) return <p className="text-center mt-20">Loading...</p>;
 
+  const handleSubmit = async () => {
+    try {
+      setError(null);
+      const userName = localStorage.getItem("ssc_user_name");
+      if (!userName || !userName.trim()) {
+        setError("Please enter your name first");
+        return;
+      }
+      await api.post("/api/attempts", {
+        userName: userName.trim(),
+        questionId: question._id,
+        selectedOption,
+      });
+      setSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to save attempt");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6">
@@ -73,7 +93,7 @@ export default function Practice() {
           {!submitted && (
             <button
               disabled={selectedOption === null}
-              onClick={() => setSubmitted(true)}
+              onClick={handleSubmit}
               className="mt-4 px-4 py-2 bg-black text-white rounded disabled:opacity-50"
             >
               Submit
